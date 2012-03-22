@@ -11,7 +11,7 @@
  *
  */
 /*
- * Qualcomm MSM8960 TSENS driver
+ * Qualcomm MSM8x60 TSENS driver
  *
  */
 
@@ -167,7 +167,7 @@ static int tsens_tz_degC_to_code(int degC, int sensor_num)
 	return code;
 }
 
-static void tsens8960_get_temp(int sensor_num, unsigned long *temp)
+static void tsens8x60_get_temp(int sensor_num, unsigned long *temp)
 {
 	unsigned int code;
 
@@ -191,7 +191,7 @@ static int tsens_tz_get_temp(struct thermal_zone_device *thermal,
 	if (!tm_sensor || tm_sensor->mode != THERMAL_DEVICE_ENABLED || !temp)
 		return -EINVAL;
 
-	tsens8960_get_temp(tm_sensor->sensor_num, temp);
+	tsens8x60_get_temp(tm_sensor->sensor_num, temp);
 
 	return 0;
 }
@@ -201,7 +201,7 @@ int tsens_get_temp(struct tsens_device *device, unsigned long *temp)
 	if (!tmdev)
 		return -ENODEV;
 
-	tsens8960_get_temp(device->sensor_num, temp);
+	tsens8x60_get_temp(device->sensor_num, temp);
 
 	return 0;
 }
@@ -787,7 +787,7 @@ static int tsens_calib_sensors(void)
 {
 	int rc = -ENODEV;
 
-	if (tmdev->hw_type == MSM_8660)
+	if (tmdev->hw_type == MSM_8660 )
 		rc = tsens_calib_sensors8660();
 	else if (tmdev->hw_type == MSM_8960 || tmdev->hw_type == MSM_9615)
 		rc = tsens_calib_sensors8960();
