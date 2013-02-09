@@ -54,6 +54,7 @@
 
 
 
+
 #define MIN_VDD_SC		700000 /* uV */
 #define MAX_VDD_SC		1350000 /* uV */
 #define MAX_VDD_MEM		1350000 /* uV */
@@ -236,6 +237,7 @@ static struct clkctl_acpu_speed acpu_freq_tbl_slow[] = {
   { {1, 1},  96000,  ACPU_PLL_8, 3, 1, 0, 0,    L2(1),   750000, 0x03006000},
   { {1, 1},  128000,  ACPU_PLL_8, 3, 1, 0, 0,    L2(1),   775000, 0x03006000},
   { {1, 1},  192000,  ACPU_PLL_8, 3, 1, 0, 0,    L2(1),   775000, 0x03006000},
+  { {1, 1},  192000,  ACPU_PLL_8, 3, 1, 0, 0,    L2(1),   780000, 0x03006000},
   /* MAX_AXI row is used to source CPU cores and L2 from the AFAB clock. */
   { {0, 0},  MAX_AXI, ACPU_AFAB,  1, 0, 0, 0,    L2(0),   800000, 0x03006000},
   { {1, 1},  384000,  ACPU_PLL_8, 3, 0, 0, 0,    L2(1),   800000, 0x03006000},
@@ -695,6 +697,42 @@ out:
 	return rc;
 }
 
+#ifdef CONFIG_VDD_USERSPACE
+ssize_t acpuclk_get_vdd_levels_str(char *buf) {
+	int i, len = 0;
+
+	if (buf) {
+		mutex_lock(&drv_state.lock);
+
+		for (i = 0; acpu_freq_tbl[i].acpuclk_khz; i++) {
+			len += sprintf(buf + len, "%8u: %8d\n", acpu_freq_tbl[i].acpuclk_khz, acpu_freq_tbl[i].vdd_sc );
+		}
+
+		mutex_unlock(&drv_state.lock);
+	}
+	return len;
+}
+
+void acpuclk_set_vdd(unsigned int khz, int vdd_uv) {
+	int i;
+	unsigned int new_vdd_uv;
+
+	mutex_lock(&drv_state.lock);
+
+	for (i = 0; acpu_freq_tbl[i].acpuclk_khz; i++) {
+		if (khz == 0)
+			new_vdd_uv = min(max((acpu_freq_tbl[i].vdd_sc + vdd_uv), (unsigned int)MIN_VDD_SC), (unsigned int)MAX_VDD_SC);
+		else if ( acpu_freq_tbl[i].acpuclk_khz == khz)
+			new_vdd_uv = min(max((unsigned int)vdd_uv, (unsigned int)MIN_VDD_SC), (unsigned int)MAX_VDD_SC);
+		else 
+			continue;
+		acpu_freq_tbl[i].vdd_sc = new_vdd_uv;
+	}
+
+	mutex_unlock(&drv_state.lock);
+}
+#endif
+
 static void __init scpll_init(int sc_pll)
 {
 	uint32_t regval;
@@ -994,3 +1032,4 @@ static int __init acpuclk_8x60_init(struct acpuclk_soc_data *soc_data)
 struct acpuclk_soc_data acpuclk_8x60_soc_data __initdata = {
 	.init = acpuclk_8x60_init,
 };
+

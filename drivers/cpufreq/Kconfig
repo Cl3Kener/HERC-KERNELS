@@ -206,6 +206,42 @@ config CPU_FREQ_GOV_CONSERVATIVE
 
 	  If in doubt, say N.
 
+config CPU_FREQ_MIN_TICKS
+	int "Ticks between governor polling interval."
+	default 10
+	help
+	  Minimum number of ticks between polling interval for governors.
+
+config CPU_FREQ_SAMPLING_LATENCY_MULTIPLIER
+	int "Sampling rate multiplier for governors."
+	default 1000
+	help
+	  Sampling latency rate multiplied by the cpu switch latency.
+	  Affects governor polling.
+
+config SEC_DVFS
+	bool "DVFS job"
+	default n
+	depends on CPU_FREQ
+
+config SEC_DVFS_UNI
+	bool "DVFS job for Uni Processer"
+	default n
+	depends on SEC_DVFS
+
+config SEC_LIMIT_LCD_OFF_CPU_MAX_FREQ
+	bool
+	default y
+	depends on CPU_FREQ_GOV_ONDEMAND
+
+config VDD_USERSPACE
+  bool "VDD sysfs interface"
+  default n
+  depends on CPU_FREQ_STAT
+  help
+    exposes the VDD table to userspace
+    allows users to adjust voltages on the fly
+
 menu "x86 CPU frequency scaling drivers"
 depends on X86
 source "drivers/cpufreq/Kconfig.x86"
