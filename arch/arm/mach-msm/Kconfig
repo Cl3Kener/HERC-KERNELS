@@ -2447,6 +2447,7 @@ config ANDROID_WIP
 	help
 	  This enables 'work in progress' hacks for android issues.
 
+<<<<<<< HEAD
 config COMPACTION_RETRY
 	bool "retry compaction once more after direct reclaim fails"
 	default n
@@ -2457,3 +2458,13 @@ config COMPACTION_RETRY
 	  we give one more try to allocate pages with forced compaction.
 	  This might avoid oom-killer invocation.
 	  with many free pages being already there.
+=======
+config FORCE_FAST_CHARGE
+  bool "Force AC charge mode at will"
+  default y
+  help
+    A simple sysfs interface to force adapters that
+    are detected as USB to charge as AC.
+ 
+endif
+>>>>>>> 2b562a4... USB Fastcharge
