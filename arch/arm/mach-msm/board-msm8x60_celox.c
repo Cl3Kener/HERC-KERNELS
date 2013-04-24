@@ -41,11 +41,7 @@
 #include <linux/i2c/isa1200.h>
 #include <linux/dma-mapping.h>
 #include <linux/i2c/bq27520.h>
-<<<<<<< HEAD
-=======
-#include <linux/i2c/qt602240_ts.h>
 #include <linux/fastchg.h>
->>>>>>> 2b562a4... USB Fastcharge
 
 #ifdef CONFIG_TOUCHSCREEN_MELFAS
 #define TOUCHSCREEN_IRQ 		125  
