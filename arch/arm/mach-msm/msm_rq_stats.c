@@ -226,6 +226,35 @@ static int system_suspend_handler(struct notifier_block *nb,
 	return NOTIFY_OK;
 }
 
+#ifdef CONFIG_MSM_MPDEC
+unsigned int get_rq_info(void)
+{
+unsigned long flags = 0;
+        unsigned int rq = 0;
+
+        spin_lock_irqsave(&rq_lock, flags);
+
+        rq = rq_info.rq_avg;
+        rq_info.rq_avg = 0;
+
+        spin_unlock_irqrestore(&rq_lock, flags);
+
+        return rq;
+}
+EXPORT_SYMBOL(get_rq_info);
+#endif  
+
+static int is_dual_locked = 0;
+static int is_sysfs_used = 0;
+static int is_uevent_sent = 0;
+static int stall_mpdecision = 0;
+
+static DEFINE_MUTEX(cpu_hotplug_driver_mutex);
+
+int cpu_hotplug_driver_test_lock(void)
+{
+	return mutex_trylock(&cpu_hotplug_driver_mutex);
+}
 
 static ssize_t hotplug_disable_show(struct kobject *kobj,
 		struct kobj_attribute *attr, char *buf)
