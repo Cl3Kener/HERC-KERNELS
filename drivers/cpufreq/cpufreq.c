@@ -432,8 +432,112 @@ static ssize_t store_##file_name					\
 	return ret ? ret : count;					\
 }
 
+#ifdef CONFIG_LINK_CPU_GOVERNORS
+static ssize_t store_scaling_min_freq
+(struct cpufreq_policy *policy, const char *buf, size_t count)
+{							
+	unsigned int ret = -EINVAL;
+	struct cpufreq_policy new_policy;
+	int cpu_alt_id = 0;
+
+
+	ret = cpufreq_get_policy(&new_policy, policy->cpu);
+	if (ret)
+		return -EINVAL;
+
+	ret = sscanf(buf, "%u", &new_policy.min);
+	if (ret != 1)
+		return -EINVAL;
+
+	ret = __cpufreq_set_policy(policy, &new_policy);
+	policy->user_policy.min = policy->min;
+
+	if (force_cpu_gov_sync != 0) {
+		cpu_alt_id = policy->cpu ? 0 : 1;
+		if (!cpu_online(cpu_alt_id)) {	
+			cpu_up(cpu_alt_id);
+		}
+		ret = cpufreq_get_policy(&new_policy, cpu_alt_id);
+		if (!ret) {
+			struct cpufreq_policy* cpu_alt=cpufreq_cpu_get(cpu_alt_id);
+			if (cpu_alt != NULL) {
+				new_policy.min = policy->min;
+				__cpufreq_set_policy(cpu_alt, &new_policy);
+				cpu_alt->user_policy.min = cpu_alt->min;
+				cpufreq_cpu_put(cpu_alt);
+			}
+		}
+	}
+
+	return ret ? ret : count;
+}
+#else
 store_one(scaling_min_freq, min);
+#endif
+
+#ifdef CONFIG_SEC_DVFS
+static ssize_t store_scaling_max_freq
+(struct cpufreq_policy *policy, const char *buf, size_t count)
+{									
+	unsigned int ret = -EINVAL;
+	unsigned int value = 0;
+	
+	ret = sscanf(buf, "%u", &value);
+	if (ret != 1)							
+		return -EINVAL;
+
+	if (policy->cpu == BOOT_CPU) 
+{									
+		if (value >= MAX_FREQ_LIMIT)
+			set_freq_limit(DVFS_THERMALD_ID, -1);
+		else if (value >= MIN_FREQ_LIMIT)
+			set_freq_limit(DVFS_THERMALD_ID, value);
+	}
+
+	return count;
+}
+#elif defined(CONFIG_LINK_CPU_GOVERNORS)
+static ssize_t store_scaling_max_freq
+(struct cpufreq_policy *policy, const char *buf, size_t count)
+{							
+	unsigned int ret = -EINVAL;
+	struct cpufreq_policy new_policy;
+	int cpu_alt_id = 0;
+
+
+	ret = cpufreq_get_policy(&new_policy, policy->cpu);
+	if (ret)
+		return -EINVAL;
+
+	ret = sscanf(buf, "%u", &new_policy.max);
+	if (ret != 1)
+		return -EINVAL;
+
+	ret = __cpufreq_set_policy(policy, &new_policy);
+	policy->user_policy.max = policy->max;
+
+	if (force_cpu_gov_sync != 0) {
+		cpu_alt_id = policy->cpu ? 0 : 1;
+		if (!cpu_online(cpu_alt_id)) {	
+			cpu_up(cpu_alt_id);
+		}
+		ret = cpufreq_get_policy(&new_policy, cpu_alt_id);
+		if (!ret) {
+			struct cpufreq_policy* cpu_alt=cpufreq_cpu_get(cpu_alt_id);
+			if (cpu_alt != NULL) {
+				new_policy.max = policy->max;
+				__cpufreq_set_policy(cpu_alt, &new_policy);
+				cpu_alt->user_policy.max = cpu_alt->max;
+				cpufreq_cpu_put(cpu_alt);
+			}
+		}
+	}
+
+	return ret ? ret : count;
+}				
+#else
 store_one(scaling_max_freq, max);
+#endif
 
 /**
  * show_cpuinfo_cur_freq - current CPU frequency as detected by hardware
@@ -476,6 +580,9 @@ static ssize_t store_scaling_governor(struct cpufreq_policy *policy,
 	char *envp[3];
 	char buf1[64];
 	char buf2[64];
+#ifdef CONFIG_LINK_CPU_GOVERNORS
+	int cpu_alt_id = 0;
+#endif
 
 	ret = cpufreq_get_policy(&new_policy, policy->cpu);
 	if (ret)
@@ -499,9 +606,13 @@ static ssize_t store_scaling_governor(struct cpufreq_policy *policy,
 	/* allow the user to force governor changes from one core to apply to the other */
 #ifdef CONFIG_LINK_CPU_GOVERNORS
 	if (force_cpu_gov_sync != 0) {
-		ret = cpufreq_get_policy(&new_policy, policy->cpu ? 0 : 1);
+		cpu_alt_id = policy->cpu ? 0 : 1;
+		if (!cpu_online(cpu_alt_id)) {					
+			cpu_up(cpu_alt_id);
+		}
+		ret = cpufreq_get_policy(&new_policy, cpu_alt_id);
 		if(!ret) {
-			struct cpufreq_policy* cpu_alt=cpufreq_cpu_get(policy->cpu ? 0 : 1);
+			struct cpufreq_policy* cpu_alt=cpufreq_cpu_get(cpu_alt_id);
 			if (cpu_alt != NULL) {
 				cpufreq_parse_governor(str_governor, &new_policy.policy,
 				&new_policy.governor);
