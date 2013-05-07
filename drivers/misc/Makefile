@@ -81,3 +81,7 @@ obj-$(CONFIG_SEC_MISC) += sec_misc.o sec_level.o sec_param.o
 ifeq ($(CONFIG_SENSORS_CORE),y)
 EXTRA_CFLAGS += -DSENSORS_LOG_DUMP
 endif
+
+ifeq ($(CONFIG_GENERIC_BLN),y)
+obj-$(CONFIG_GENERIC_BLN) += bln.o
+endif
