@@ -104,7 +104,7 @@ static unsigned int sleep_max_freq;
  * The frequency to set when waking up from sleep.
  * When sleep_max_freq=0 this will have no effect.
  */
-#define DEFAULT_SLEEP_WAKEUP_FREQ 594000
+#define DEFAULT_SLEEP_WAKEUP_FREQ 702000
 static unsigned int sleep_wakeup_freq;
 
 /*
@@ -125,14 +125,14 @@ static unsigned int sample_rate_jiffies;
  * Freqeuncy delta when ramping up.
  * zero disables and causes to always jump straight to max frequency.
  */
-#define DEFAULT_RAMP_UP_STEP 128000
+#define DEFAULT_RAMP_UP_STEP 384000
 static unsigned int ramp_up_step;
 
 /*
  * Freqeuncy delta when ramping down.
  * zero disables and will calculate ramp down according to load heuristic.
  */
-#define DEFAULT_RAMP_DOWN_STEP 128000
+#define DEFAULT_RAMP_DOWN_STEP 0
 static unsigned int ramp_down_step;
 
 /*
