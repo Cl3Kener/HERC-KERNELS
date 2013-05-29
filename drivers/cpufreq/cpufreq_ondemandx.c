@@ -38,7 +38,6 @@
 #define MICRO_FREQUENCY_MIN_SAMPLE_RATE		(10000)
 #define MIN_FREQUENCY_UP_THRESHOLD		(11)
 #define MAX_FREQUENCY_UP_THRESHOLD		(100)
-#define DEF_SUSPEND_FREQ				(500000)
 
 /*
  * The polling frequency of this governor depends on the capability of
@@ -66,7 +65,7 @@ static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 static
 #endif
 struct cpufreq_governor cpufreq_gov_ondemandx = {
-       .name                   = "ondemandx",
+       .name                   = "OndemandX",
        .governor               = cpufreq_governor_dbs,
        .max_transition_latency = TRANSITION_LATENCY_LIMIT,
        .owner                  = THIS_MODULE,
@@ -119,7 +118,7 @@ static struct dbs_tuners {
 	.down_differential = DEF_FREQUENCY_DOWN_DIFFERENTIAL,
 	.ignore_nice = 0,
 	.powersave_bias = 50,
-	.suspend_freq = DEF_SUSPEND_FREQ,
+	//.suspend_freq = DEF_SUSPEND_FREQ,
 };
 
 
@@ -499,7 +498,7 @@ static struct attribute *dbs_attributes[] = {
 
 static struct attribute_group dbs_attr_group = {
 	.attrs = dbs_attributes,
-	.name = "ondemandx",
+	.name = "OndemandX",
 };
 
 /************************** sysfs end ************************/

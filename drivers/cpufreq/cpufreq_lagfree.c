@@ -37,13 +37,13 @@
 
 #define DEF_FREQUENCY_UP_THRESHOLD				(60)
 #define DEF_FREQUENCY_DOWN_THRESHOLD				(30)
-#define FREQ_STEP_DOWN 						(192000)
+#define FREQ_STEP_DOWN 						(108000)
 static unsigned int step_down;
 #define FREQ_SLEEP_MAX 						(486000)
 static unsigned int sleep_max;
 #define FREQ_AWAKE_MIN 						(384000)
 static unsigned int awake_min;
-#define FREQ_STEP_UP_SLEEP_PERCENT				(15)
+#define FREQ_STEP_UP_SLEEP_PERCENT				(20)
 
 /*
  * The polling frequency of this governor depends on the capability of
