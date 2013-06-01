@@ -580,9 +580,8 @@ static ssize_t store_scaling_governor(struct cpufreq_policy *policy,
 	char *envp[3];
 	char buf1[64];
 	char buf2[64];
-#ifdef CONFIG_LINK_CPU_GOVERNORS
-	int cpu_alt_id = 0;
-#endif
+	int alt_cpu;
+	struct cpufreq_policy* alt_policy;
 
 	ret = cpufreq_get_policy(&new_policy, policy->cpu);
 	if (ret)
@@ -603,28 +602,23 @@ static ssize_t store_scaling_governor(struct cpufreq_policy *policy,
 	policy->user_policy.policy = policy->policy;
 	policy->user_policy.governor = policy->governor;
 
-	/* allow the user to force governor changes from one core to apply to the other */
-#ifdef CONFIG_LINK_CPU_GOVERNORS
-	if (force_cpu_gov_sync != 0) {
-		cpu_alt_id = policy->cpu ? 0 : 1;
-		if (!cpu_online(cpu_alt_id)) {					
-			cpu_up(cpu_alt_id);
-		}
-		ret = cpufreq_get_policy(&new_policy, cpu_alt_id);
-		if(!ret) {
-			struct cpufreq_policy* cpu_alt=cpufreq_cpu_get(cpu_alt_id);
-			if (cpu_alt != NULL) {
-				cpufreq_parse_governor(str_governor, &new_policy.policy,
-				&new_policy.governor);
-				__cpufreq_set_policy(cpu_alt, &new_policy);
-				cpu_alt->user_policy.policy = cpu_alt->policy;
-				cpu_alt->user_policy.governor = cpu_alt->governor;
-				cpufreq_cpu_put(cpu_alt);
-			}
+	alt_cpu = policy->cpu ? 0 : 1;
+	if(!cpu_online(alt_cpu))
+		cpu_up(alt_cpu);
+
+	if(!cpufreq_get_policy(&new_policy, alt_cpu)) {
+		alt_policy=cpufreq_cpu_get(alt_cpu);
+
+		if(alt_policy != NULL) {
+			cpufreq_parse_governor(str_governor, &new_policy.policy, &new_policy.governor);
+			__cpufreq_set_policy(alt_policy, &new_policy);
+			alt_policy->user_policy.policy = alt_policy->policy;
+			alt_policy->user_policy.governor = alt_policy->governor;
+			cpufreq_cpu_put(alt_policy);
 		}
 	}
-#endif
-		sysfs_notify(&policy->kobj, NULL, "scaling_governor");
+
+	sysfs_notify(&policy->kobj, NULL, "scaling_governor");
 
 		snprintf(buf1, sizeof(buf1), "GOV=%s", policy->governor->name);
 		snprintf(buf2, sizeof(buf2), "CPU=%u", policy->cpu);
