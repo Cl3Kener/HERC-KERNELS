@@ -60,8 +60,6 @@ else ifdef CONFIG_KOR_MODEL_SHV_E160S
 obj-$(CONFIG_KEYPAD_CYPRESS_TOUCH)                += cypress-touchkey_q1_skt.o
 else ifdef CONFIG_KOR_MODEL_SHV_E160K
 obj-$(CONFIG_KEYPAD_CYPRESS_TOUCH)                += cypress-touchkey_q1_skt.o
-else ifdef CONFIG_GENERIC_BLN
-obj-$(CONFIG_KEYPAD_CYPRESS_TOUCH)                += cypress-touchkey-bln.o 
 else
 obj-$(CONFIG_KEYPAD_CYPRESS_TOUCH)                += cypress-touchkey.o
 endif

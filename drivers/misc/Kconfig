@@ -685,13 +685,6 @@ source "drivers/misc/ti-st/Kconfig"
 source "drivers/misc/lis3lv02d/Kconfig"
 source "drivers/misc/carma/Kconfig"
 
-config GENERIC_BLN
-    	bool "Generic BLN support for backlight notification"
-    	default n
-    	help
-    	  Say Y here to enable the backlight notification
-    	  for android led-notification (modified liblight needed)
-
 menuconfig VIBETONZ
         tristate "Vibetonz"
         default m
