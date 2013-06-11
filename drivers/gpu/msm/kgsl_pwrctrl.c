@@ -124,14 +124,6 @@ void kgsl_pwrctrl_pwrlevel_change(struct kgsl_device *device,
 
 	level = pwr->active_pwrlevel;
 
-	/*
-	 * Set the active powerlevel first in case the clocks are off - if we
-	 * don't do this then the pwrlevel change won't take effect when the
-	 * clocks come back
-	 */
-
-	pwr->active_pwrlevel = new_level;
-
 	if (test_bit(KGSL_PWRFLAGS_CLK_ON, &pwr->power_flags) ||
 		(device->state == KGSL_STATE_NAP)) {
 
@@ -150,10 +142,23 @@ void kgsl_pwrctrl_pwrlevel_change(struct kgsl_device *device,
 		 */
 
 		while (level != new_level) {
-			level += delta;
+	        	/*
+       	 	 	 * Set the active powerlevel first in case the clocks are off - if we
+         	 	 * don't do this then the pwrlevel change won't take effect when the
+         	 	 * clocks come back
+          	 	 */
 
+			level += delta;
+			pwr->active_pwrlevel = level;
+			
 			clk_set_rate(pwr->grp_clks[0],
-				pwr->pwrlevels[level].gpu_freq);
+                                pwr->pwrlevels[level].gpu_freq);
+		
+#ifdef CONFIG_KGSL_GPU_CTRL
+			if(diff < 1 && level  == gpu_3d_freq_phase)
+					break;
+#endif
+
 		}
 	}
 
