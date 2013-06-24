@@ -3779,7 +3779,7 @@ static ssize_t ext4_ext_direct_IO(int rw, struct kiocb *iocb,
 		EXT4_I(inode)->cur_aio_dio = NULL;
 		if (!is_sync_kiocb(iocb)) {
 			iocb->private = ext4_init_io_end(inode, GFP_NOFS);
-			if (!iocb->private) 
+			if (!iocb->private)
 				return -ENOMEM;
 			/*
 			 * we save the io structure for current async
