@@ -1,7 +1,11 @@
+config XVMALLOC
+	bool
+	default n
+
 config ZRAM
 	tristate "Compressed RAM block device support"
-	depends on BLOCK && SYSFS && ZSMALLOC && CRYPTO=y
-	select CRYPTO_LZO
+	depends on BLOCK && SYSFS
+	select XVMALLOC
 	default n
 	help
 	  Creates virtual block devices called /dev/zramX (X = 0, 1, ...).
@@ -13,7 +17,7 @@ config ZRAM
 	  disks and maybe many more.
 
 	  See zram.txt for more information.
-	  Project home: <https://compcache.googlecode.com/>
+	  Project home: http://compcache.googlecode.com/
 
 config ZRAM_DEBUG
 	bool "Compressed RAM block device debug support"
@@ -29,8 +33,6 @@ config ZRAM_FOR_ANDROID
 	default n
 	help
 	  This option enables modified zram behavior optimized for android
-<<<<<<< HEAD
-=======
 
 choice ZRAM_COMPRESS
 	prompt "compression method"
@@ -54,4 +56,3 @@ config ZRAM_LZ4
 	depends on LZ4_COMPRESS
 	depends on LZ4_DECOMPRESS
 endchoice
->>>>>>> 30370d7... zRam : add LZ4 compression option as alternative to LZO or Snappy compression to use as zRam compression algorithm
