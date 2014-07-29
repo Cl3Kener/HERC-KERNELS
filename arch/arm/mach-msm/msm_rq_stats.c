@@ -496,7 +496,7 @@ static int init_rq_attribs(void)
 
 	/* Create /sys/devices/system/cpu/cpu0/rq-stats/... */
 	rq_info.kobj = kobject_create_and_add("rq-stats",
-			&get_cpu_device(0)->kobj);
+			&get_cpu_sysdev(0)->kobj);
 	if (!rq_info.kobj)
 		return -ENOMEM;
 
