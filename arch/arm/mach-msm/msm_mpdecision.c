@@ -41,7 +41,7 @@
 #define MSM_MPDEC_STARTDELAY            70000
 #define MSM_MPDEC_DELAY                 70
 #define MSM_MPDEC_PAUSE                 10000
-#define MSM_MPDEC_IDLE_FREQ             486000
+#define MSM_MPDEC_IDLE_FREQ             384000
 
 enum {
 	MSM_MPDEC_DISABLED = 0,
