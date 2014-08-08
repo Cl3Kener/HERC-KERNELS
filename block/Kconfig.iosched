@@ -79,14 +79,11 @@ config IOSCHED_ZEN
 	  Should work best with devices where there is no travel delay.
 	  Enable group IO scheduling in CFQ.
 
-config IOSCHED_AS
-	tristate "Anticipatory I/O scheduler"
-	default y
-	---help---
-	  The anticipatory I/O scheduler is generally a good choice for most
-	  environments, but is quite large and complex when compared to the
-	  deadline I/O scheduler, it can also be slower in some cases
-	  especially some database loads.
+config IOSCHED_FIFO
+ 	 bool
+ 	 default y
+ 	 ---help---
+ 	 Fifo is similar to no-op I/O scheduler and it's a minimal scheduler that does basic merging and sorting.
 
 config IOSCHED_BFQ
 	tristate "BFQ I/O scheduler"
@@ -98,7 +95,7 @@ config IOSCHED_BFQ
 	  It aims at distributing the bandwidth as desired, independently of
 	  the disk parameters and with any workload. It also tries to
 	  guarantee low latency to interactive and soft real-time
-	  applications.  If compiled built-in (saying Y here), BFQ can
+	  applications. If compiled built-in (saying Y here), BFQ can
 	  be configured to support hierarchical scheduling.
 
 config CGROUP_BFQIO
@@ -135,6 +132,13 @@ choice
 
 	config DEFAULT_BFQ
 		bool "BFQ" if IOSCHED_BFQ=y
+		help
+		  Selects BFQ as the default I/O scheduler which will be
+		  used by default for all block devices.
+		  The BFQ I/O scheduler aims at distributing the bandwidth
+		  as desired, independently of the disk parameters and with
+		  any workload. It also tries to guarantee low latency to
+		  interactive and soft real-time applications.
 
 	config DEFAULT_NOOP
 		bool "No-op"
@@ -157,7 +161,6 @@ config DEFAULT_IOSCHED
 	string
 	default "deadline" if DEFAULT_DEADLINE
 	default "row" if DEFAULT_ROW
-	default "anticipatory" if DEFAULT_AS
 	default "cfq" if DEFAULT_CFQ
 	default "bfq" if DEFAULT_BFQ
 	default "noop" if DEFAULT_NOOP
