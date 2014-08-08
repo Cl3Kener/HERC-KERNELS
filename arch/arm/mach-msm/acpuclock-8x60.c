@@ -882,7 +882,7 @@ static unsigned int __init select_freq_plan(void)
 		speed_bin = (pte_efuse >> 4) & 0xF;
 
 	if (speed_bin == 0x1) {
-		max_khz = MAX_FREQ_LIMIT;
+		max_khz = 1512000;
 		pvs = (pte_efuse >> 10) & 0x7;
 		if (pvs == 0x7)
 			pvs = (pte_efuse >> 13) & 0x7;
@@ -907,7 +907,7 @@ static unsigned int __init select_freq_plan(void)
 			break;
 		}
 	} else if (speed_bin == 0x0 ) {
-		max_khz = MAX_FREQ_LIMIT;
+		max_khz = 1512000;
 		pvs = (pte_efuse >> 10) & 0x7;
                 if (pvs == 0x7)
                         pvs = (pte_efuse >> 13) & 0x7;
