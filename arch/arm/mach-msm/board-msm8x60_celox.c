@@ -16707,7 +16707,7 @@ static void __init msm8x60_init(struct msm_board_data *board_data)
 	 * it for their initialization.
 	 */
 
-	msm_tsens_early_init(&her_tsens_pdata);
+	//msm_tsens_early_init(&her_tsens_pdata);
 
 #ifdef CONFIG_MSM_RPM
 	BUG_ON(msm_rpm_init(&msm_rpm_data));
