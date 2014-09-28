@@ -232,7 +232,7 @@ static struct clkctl_acpu_speed acpu_freq_tbl_1188mhz[] = {
 };
 
 /* SCPLL frequencies = 2 * 27 MHz * L_VAL */
-static struct clkctl_acpu_speed acpu_freq_tbl_wild[] = {
+static struct clkctl_acpu_speed acpu_freq_tbl_uber[] = {
   { {1, 1},  96000,  ACPU_PLL_8, 3, 1, 0, 0,    L2(1),   725000, 0x03006000},
   { {1, 1},  128000,  ACPU_PLL_8, 3, 1, 0, 0,    L2(1),   750000, 0x03006000},
   { {1, 1},  153600,  ACPU_PLL_8, 3, 1, 0, 0,    L2(1),   750000, 0x03006000},
@@ -261,12 +261,12 @@ static struct clkctl_acpu_speed acpu_freq_tbl_wild[] = {
   { {1, 1}, 1404000,  ACPU_SCPLL, 0, 0, 1, 0x1A, L2(19), 1125000, 0x03006000},
   { {1, 1}, 1458000,  ACPU_SCPLL, 0, 0, 1, 0x1B, L2(19), 1125000, 0x03006000},
   { {1, 1}, 1512000,  ACPU_SCPLL, 0, 0, 1, 0x1C, L2(19), 1225000, 0x03006000},
-  { {1, 1}, 1620000,  ACPU_SCPLL, 0, 0, 1, 0x1D, L2(20), 1225000, 0x03006000},
-  { {1, 1}, 1674000,  ACPU_SCPLL, 0, 0, 1, 0x1E, L2(20), 1250000, 0x03006000},
-  { {1, 1}, 1728000,  ACPU_SCPLL, 0, 0, 1, 0x1F, L2(20), 1275000, 0x03006000},
-  { {1, 1}, 1782000,  ACPU_SCPLL, 0, 0, 1, 0x20, L2(20), 1275000, 0x03006000},
-  { {1, 1}, 1836000,  ACPU_SCPLL, 0, 0, 1, 0x21, L2(20), 1300000, 0x03006000},
-  { {1, 1}, 1890000,  ACPU_SCPLL, 0, 0, 1, 0x22, L2(20), 1300000, 0x03006000},
+  { {1, 1}, 1620000,  ACPU_SCPLL, 0, 0, 1, 0x1D, L2(19), 1250000, 0x03006000},
+  { {1, 1}, 1728000,  ACPU_SCPLL, 0, 0, 1, 0x1E, L2(20), 1275000, 0x03006000},
+  { {1, 1}, 1836000,  ACPU_SCPLL, 0, 0, 1, 0x1F, L2(20), 1300000, 0x03006000},
+  { {1, 1}, 1890000,  ACPU_SCPLL, 0, 0, 1, 0x20, L2(20), 1300000, 0x03006000},
+  { {1, 1}, 1944000,  ACPU_SCPLL, 0, 0, 1, 0x21, L2(20), 1300000, 0x03006000},
+  { {1, 1}, 1998000,  ACPU_SCPLL, 0, 0, 1, 0x22, L2(20), 1300000, 0x03006000},
   { {0, 0}, 0 },
 };
 
@@ -332,7 +332,7 @@ static struct clkctl_acpu_speed acpu_freq_tbl_fast[] = {
 
 
 /* acpu_freq_tbl row to use when reconfiguring SC/L2 PLLs. */
-#define CAL_IDX 4
+#define CAL_IDX 1
 
 static struct clkctl_acpu_speed *acpu_freq_tbl;
 static struct clkctl_l2_speed *l2_freq_tbl = l2_freq_tbl_v2;
@@ -934,7 +934,7 @@ static unsigned int __init select_freq_plan(void)
 		speed_bin = (pte_efuse >> 4) & 0xF;
 
 	if (speed_bin == 0x1) {
-		max_khz = 1890000;
+		max_khz = 1998000;
 		pvs = (pte_efuse >> 10) & 0x7;
 		if (pvs == 0x7)
 			pvs = (pte_efuse >> 13) & 0x7;
@@ -943,7 +943,7 @@ static unsigned int __init select_freq_plan(void)
 		switch (pvs) {
 		case 0x0:
 		case 0x7:
-			acpu_freq_tbl = acpu_freq_tbl_wild;
+			acpu_freq_tbl = acpu_freq_tbl_uber;
 			pr_info("ACPU PVS: Slow\n");
 			break;
 		case 0x1:
@@ -955,25 +955,9 @@ static unsigned int __init select_freq_plan(void)
 			pr_info("ACPU PVS: Fast\n");
 			break;
 		default:
-			acpu_freq_tbl = acpu_freq_tbl_wild;
+			acpu_freq_tbl = acpu_freq_tbl_uber;
 			pr_warn("ACPU PVS: Unknown. Defaulting to slow.\n");
 			break;
-		}
-	} else if (speed_bin == 0x0 ) {
-		max_khz = 1890000;
-		pvs = (pte_efuse >> 10) & 0x7;
-                if (pvs == 0x7)
-                        pvs = (pte_efuse >> 13) & 0x7;
-
-                switch (pvs) {
-                case 0x0:
-			acpu_freq_tbl = acpu_freq_tbl_nom;
-                        pr_info("ACPU PVS: Nominal\n");
-                        break;
-		default:
-			acpu_freq_tbl = acpu_freq_tbl_wild;
-                        pr_warn("ACPU PVS: Unknown. Defaulting to slow.\n");
-                        break;
 		}
 	} else {
 		max_khz = 1188000;
@@ -1032,4 +1016,3 @@ static int __init acpuclk_8x60_init(struct acpuclk_soc_data *soc_data)
 struct acpuclk_soc_data acpuclk_8x60_soc_data __initdata = {
 	.init = acpuclk_8x60_init,
 };
-
