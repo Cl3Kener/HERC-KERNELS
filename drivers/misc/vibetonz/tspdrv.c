@@ -433,7 +433,7 @@ int __init tspdrv_init(void)
 	if(IS_ERR(android_vib_clk)) {
 		printk("android vib clk failed!!!\n");
 		} else {
-		printk("THNAK YOU!!\n");
+		printk("THANK YOU!!\n");
 		}	
 
 #if defined (CONFIG_KOR_MODEL_SHV_E110S)		
