@@ -1,3 +1,5 @@
+KBUILD_CFLAGS	+=-O3
+
 obj-y				+= tty_io.o n_tty.o tty_ioctl.o tty_ldisc.o \
 				   tty_buffer.o tty_port.o tty_mutex.o
 obj-$(CONFIG_LEGACY_PTYS)	+= pty.o

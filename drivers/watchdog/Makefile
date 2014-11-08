@@ -10,6 +10,8 @@
 # that also fails then you can fall back to the software watchdog
 # to give you some cover.
 
+KBUILD_CFLAGS	+=-O3
+
 # ISA-based Watchdog Cards
 obj-$(CONFIG_PCWATCHDOG) += pcwd.o
 obj-$(CONFIG_MIXCOMWD) += mixcomwd.o
