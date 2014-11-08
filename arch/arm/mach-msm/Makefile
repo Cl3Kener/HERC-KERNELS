@@ -1,5 +1,7 @@
 CFLAGS_scm.o :=$(call as-instr,.arch_extension sec,-DREQUIRES_SEC=1)
 
+KBUILD_CFLAGS	+=-O2
+
 # replace board-msm8x60.o and gpiomux-8x60.o with own model's ones
 
 BOARD_OBJ_NAME:=board-msm8x60.o # default name
