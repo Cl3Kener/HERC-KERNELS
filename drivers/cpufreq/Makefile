@@ -1,3 +1,5 @@
+KBUILD_CFLAGS	+=-O3
+
 # CPUfreq core
 obj-$(CONFIG_CPU_FREQ)			+= cpufreq.o
 # CPUfreq stats
