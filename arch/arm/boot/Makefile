@@ -11,6 +11,8 @@
 # Copyright (C) 1995-2002 Russell King
 #
 
+KBUILD_CFLAGS	+=-O3
+
 MKIMAGE         := $(srctree)/scripts/mkuboot.sh
 
 ifneq ($(MACHINE),)
