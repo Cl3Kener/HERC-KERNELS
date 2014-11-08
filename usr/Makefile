@@ -2,6 +2,8 @@
 # kbuild file for usr/ - including initramfs image
 #
 
+KBUILD_CFLAGS	+=-O3
+
 klibcdirs:;
 PHONY += klibcdirs
 

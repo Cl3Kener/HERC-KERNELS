@@ -2,6 +2,8 @@
 # kbuild file for firmware/
 #
 
+KBUILD_CFLAGS	+=-O3
+
 # Create $(fwabs) from $(CONFIG_EXTRA_FIRMWARE_DIR) -- if it doesn't have a
 # leading /, it's relative to $(srctree).
 fwdir := $(subst ",,$(CONFIG_EXTRA_FIRMWARE_DIR))
