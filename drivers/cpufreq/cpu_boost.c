@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2014, Sultanxda <sultanxda@gmail.com>
+ * Copyright (c) 2014, Emmanuel Utomi <emmanuelutomi@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -17,6 +18,7 @@
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/moduleparam.h>
+#include <linux/retain_cpu_policy.h>
 
 static struct delayed_work boost_work;
 
@@ -28,8 +30,7 @@ static unsigned int boost_freq_khz = 0;
 static unsigned int boost_override = 0;
 static unsigned int cpu_boosted = 0;
 static unsigned int init_done = 0;
-static unsigned int maxfreq_orig = 0;
-static unsigned int minfreq_orig = 0;
+struct cpufreq_user_policy orig_policy[CONFIG_NR_CPUS];
 
 void cpu_boost_timeout(unsigned int freq_mhz, unsigned int duration_ms)
 {
@@ -85,17 +86,25 @@ void cpu_boost_startup(void)
 
 static void save_original_freq_limits(void)
 {
-	struct cpufreq_policy *policy = cpufreq_cpu_get(0);
-
-	minfreq_orig = policy->user_policy.min;
-	maxfreq_orig = policy->user_policy.max;
-
-	cpufreq_cpu_put(policy);
+	int cpu;
+	for_each_possible_cpu(cpu){
+		if(retained_cpu_policy(cpu)) {
+			orig_policy[cpu].min = get_retained_min_cpu_freq(cpu);
+			orig_policy[cpu].max = get_retained_max_cpu_freq(cpu);
+		}
+		else{
+			struct cpufreq_policy *policy = cpufreq_cpu_get(0);
+			orig_policy[cpu].min = policy->user_policy.min;
+			orig_policy[cpu].max = policy->user_policy.max;
+			cpufreq_cpu_put(policy);
+		}
+	}
 }
 
 static void set_new_minfreq(unsigned int minfreq, unsigned int cpu)
 {
 	struct cpufreq_policy *policy = cpufreq_cpu_get(cpu);
+	if(policy == NULL) policy = cpufreq_cpu_get(0);
 
 	policy->user_policy.min = minfreq;
 
@@ -108,8 +117,11 @@ static void restore_original_minfreq(void)
 	/*
 	 * Restore minfreq for only CPU0 as freq limits for other
 	 * CPUs are synced against CPU0 in msm/cpufreq.
+	 *
+	 * -Emman: This can be interchanged in my kernel, so I patched it with some good ol' retain_cpu_policy logic.
 	 */
-	set_new_minfreq(minfreq_orig, 0);
+	int cpu;
+	for_each_possible_cpu(cpu) set_new_minfreq(orig_policy[cpu].min, cpu);
 
 	boost_duration_ms = 0;
 	cpu_boosted = 0;
@@ -127,24 +139,24 @@ static void __cpuinit cpu_boost_main(struct work_struct *work)
 
 	if (!boost_override)
 		save_original_freq_limits();
-
-	if (boost_freq_khz) {
-		if (boost_freq_khz >= maxfreq_orig) {
-			if (maxfreq_orig <= 486000) {
-				boost_duration_ms = 0;
-				boost_override = 0;
-				return;
+	
+	/* Boost online CPUs. */
+	for_each_online_cpu(cpu){
+		if (boost_freq_khz) {
+			if (boost_freq_khz >= orig_policy[cpu].max) {
+				if (orig_policy[cpu].max <= 486000) {
+					boost_duration_ms = 0;
+					boost_override = 0;
+					return;
+				} else
+					minfreq = orig_policy[cpu].max - 108000;
 			} else
-				minfreq = maxfreq_orig - 108000;
-		} else
-			minfreq = boost_freq_khz;
+				minfreq = boost_freq_khz;
 
-		/* Boost online CPUs. */
-		for_each_online_cpu(cpu)
 			set_new_minfreq(minfreq, cpu);
-
-		cpu_boosted = 1;
+		}
 	}
+	cpu_boosted = 1;
 
 	if (boost_duration_ms)
 		wait_ms = boost_duration_ms;
@@ -196,6 +208,7 @@ static int __init cpu_boost_init(void)
 	cpu_boost_kobject = kobject_create_and_add("cpu_boost", kernel_kobj);
 	if (cpu_boost_kobject) retval = sysfs_create_group(cpu_boost_kobject, &cpu_boost_attr_group);
 	if (retval) kobject_put(cpu_boost_kobject);
+	save_original_freq_limits();
 	init_done = 1;
 
 	return 0;
