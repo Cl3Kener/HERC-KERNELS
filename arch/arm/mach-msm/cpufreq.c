@@ -350,6 +350,7 @@ static int __cpuinit msm_cpufreq_init(struct cpufreq_policy *policy)
 	int cur_freq;
 	int index;
 	struct cpufreq_frequency_table *table;
+	struct cpufreq_policy primary_policy;
 #ifdef CONFIG_SMP
 	struct cpufreq_work_struct *cpu_work = NULL;
 #endif
@@ -398,17 +399,22 @@ static int __cpuinit msm_cpufreq_init(struct cpufreq_policy *policy)
 	init_completion(&cpu_work->complete);
 #endif
 
-	if(retained_cpu_policy(policy->cpu)) {
+	if(retained_cpu_policy(policy->cpu)){
 		policy->governor = get_retained_governor(policy->cpu);
 		policy->min = get_retained_min_cpu_freq(policy->cpu);
 		policy->max = get_retained_max_cpu_freq(policy->cpu);
 	}
-	#ifdef CONFIG_MSM_CPU_FREQ_SET_MIN_MAX
+	else if (policy->cpu > 0){
+		cpufreq_get_policy(&primary_policy, 0);
+		policy->min = primary_policy.min;
+		policy->max = primary_policy.max;
+	}
+#ifdef CONFIG_MSM_CPU_FREQ_SET_MIN_MAX
 	else{
 		policy->min = CONFIG_MSM_CPU_FREQ_MIN;
 		policy->max = CONFIG_MSM_CPU_FREQ_MAX;
 	}
-	#endif
+#endif
 
 	return 0;
 }
