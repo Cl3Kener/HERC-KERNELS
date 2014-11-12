@@ -24,14 +24,12 @@ void retain_cpu_policy(struct cpufreq_policy *policy)
 		user_policy[policy->cpu].min = policy->min;
 		user_policy[policy->cpu].max = policy->max;
 		user_policy[policy->cpu].governor = policy->governor;
-		user_policy[policy->cpu].set = true;
 	}
-	else user_policy[policy->cpu].set = false;
 }
 
 bool retained_cpu_policy(int cpu)
 {
-	return user_policy[cpu].set;
+	return (user_policy[cpu].min != NULL && user_policy[cpu].max != NULL && user_policy[cpu].governor != NULL);
 }
 
 unsigned int get_retained_min_cpu_freq(int cpu)
@@ -51,9 +49,7 @@ struct cpufreq_governor* get_retained_governor(int cpu)
 
 int retain_cpu_policy_init(void)
 {
-	int cpu;
-	for_each_possible_cpu(cpu) user_policy[cpu].set = false;
-	
+	printk("retain_cpu_policy: Emman was here.\n");
 	return 0;
 }
 

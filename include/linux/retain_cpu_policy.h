@@ -17,7 +17,6 @@
 #define LINUX_RETAIN_CPUPOLICY_H
 
 struct cpufreq_user_policy {
-	bool set;
 	unsigned int min;
 	unsigned int max;
 	struct cpufreq_governor* governor;
