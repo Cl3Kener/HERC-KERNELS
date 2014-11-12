@@ -14,11 +14,11 @@
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/cpufreq.h>
-#include <linux/retain_cpu_freq.h>
+#include <linux/retain_cpu_policy.h>
 
 struct cpufreq_user_policy user_policy[CONFIG_NR_CPUS];
 
-void retain_cpu_freq_policy(struct cpufreq_policy *policy)
+void retain_cpu_policy(struct cpufreq_policy *policy)
 {
 	if(policy != NULL){
 		user_policy[policy->cpu].min = policy->min;
@@ -29,7 +29,7 @@ void retain_cpu_freq_policy(struct cpufreq_policy *policy)
 	else user_policy[policy->cpu].set = false;
 }
 
-bool retained_cpu_freq_policy(int cpu)
+bool retained_cpu_policy(int cpu)
 {
 	return user_policy[cpu].set;
 }
@@ -49,7 +49,7 @@ struct cpufreq_governor* get_retained_governor(int cpu)
 	return user_policy[cpu].governor;
 }
 
-int retain_cpu_freq_init(void)
+int retain_cpu_policy_init(void)
 {
 	int cpu;
 	for_each_possible_cpu(cpu) user_policy[cpu].set = false;
@@ -57,5 +57,5 @@ int retain_cpu_freq_init(void)
 	return 0;
 }
 
-module_init(retain_cpu_freq_init);
+module_init(retain_cpu_policy_init);
 MODULE_AUTHOR("Emmanuel Utomi <emmanuelutomi@gmail.com>");

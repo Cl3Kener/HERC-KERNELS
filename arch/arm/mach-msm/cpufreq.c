@@ -29,7 +29,7 @@
 #include <linux/suspend.h>
 #include <mach/socinfo.h>
 #include <mach/cpufreq.h>
-#include <linux/retain_cpu_freq.h>
+#include <linux/retain_cpu_policy.h>
 
 #include "acpuclock.h"
 
@@ -398,7 +398,7 @@ static int __cpuinit msm_cpufreq_init(struct cpufreq_policy *policy)
 	init_completion(&cpu_work->complete);
 #endif
 
-	if(retained_cpu_freq_policy(policy->cpu)) {
+	if(retained_cpu_policy(policy->cpu)) {
 		policy->governor = get_retained_governor(policy->cpu);
 		policy->min = get_retained_min_cpu_freq(policy->cpu);
 		policy->max = get_retained_max_cpu_freq(policy->cpu);

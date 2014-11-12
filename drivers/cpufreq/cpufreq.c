@@ -30,7 +30,7 @@
 #include <linux/mutex.h>
 #include <linux/syscore_ops.h>
 #include <linux/cpugovsync.h>
-#include <linux/retain_cpu_freq.h>
+#include <linux/retain_cpu_policy.h>
 
 #include <trace/events/power.h>
 
@@ -430,7 +430,7 @@ static ssize_t store_##file_name					\
 	ret = __cpufreq_set_policy(policy, &new_policy);		\
 	policy->user_policy.object = policy->object;			\
 									\
-	retain_cpu_freq_policy(&new_policy);					\
+	retain_cpu_policy(&new_policy);					\
 									\
 	return ret ? ret : count;					\
 }
@@ -471,7 +471,7 @@ static ssize_t store_scaling_min_freq
 			}
 		}
 	}
-	retain_cpu_freq_policy(&new_policy);
+	retain_cpu_policy(&new_policy);
 
 	return ret ? ret : count;
 }
@@ -536,7 +536,7 @@ static ssize_t store_scaling_max_freq
 			}
 		}
 	}
-	retain_cpu_freq_policy(&new_policy);
+	retain_cpu_policy(&new_policy);
 
 	return ret ? ret : count;
 }				
@@ -633,7 +633,7 @@ static ssize_t store_scaling_governor(struct cpufreq_policy *policy,
 		kobject_uevent_env(cpufreq_global_kobject, KOBJ_ADD, envp);
 	}
 	#endif
-	retain_cpu_freq_policy(&new_policy);
+	retain_cpu_policy(&new_policy);
 	if (ret) return ret;
 	else return count;
 }

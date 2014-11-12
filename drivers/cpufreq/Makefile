@@ -8,8 +8,8 @@ obj-$(CONFIG_CPU_FREQ_STAT)             += cpufreq_stats.o
 # CPU-boost framework
 obj-$(CONFIG_CPU_BOOST_FRAMEWORK)	+= cpu_boost.o
 
-# Retain CPU Freqs after hotplug
-obj-$(CONFIG_CPU_FREQ_RETAIN_MIN_MAX)	+= retain_cpu_freq.o
+# Retain CPU Policy after hotplug
+obj-$(CONFIG_CPU_FREQ_RETAIN_POLICY)	+= retain_cpu_policy.o
 
 # CPUfreq governors 
 obj-$(CONFIG_CPU_FREQ_GOV_WHEATLEY)	+= cpufreq_wheatley.o
